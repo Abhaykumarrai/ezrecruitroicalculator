@@ -1,759 +1,378 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>EzRecruit ROI Calculator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#f4f6f9;
-  --surface:#ffffff;
-  --surface-2:#f8fafc;
-  --border:#e2e8f0;
-  --border-strong:#cbd5e1;
-  --text:#0f172a;
-  --text-secondary:#475569;
-  --text-muted:#94a3b8;
-  --accent:#0f766e;
-  --accent-soft:#ccfbf1;
-  --accent-hover:#0d9488;
-  --highlight:#0369a1;
-  --highlight-soft:#e0f2fe;
-  --radius:12px;
-  --radius-sm:8px;
-  --shadow:0 1px 2px rgba(15,23,42,.04),0 4px 16px rgba(15,23,42,.06);
-  --shadow-lg:0 8px 32px rgba(15,23,42,.12);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden}
-body{
-  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  line-height:1.4;
-  -webkit-font-smoothing:antialiased;
-  -webkit-tap-highlight-color:transparent;
-}
-.shell{
-  height:100vh;
-  height:100dvh;
-  display:grid;
-  grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
-  grid-template-rows:1fr auto;
-  overflow:hidden;
-  padding:12px 12px 0;
-  background:var(--bg);
-}
-.configure{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:16px 18px 14px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  min-height:0;
-  box-shadow:var(--shadow);
-}
-.brand{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding-bottom:10px;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.brand img{height:32px;width:auto;max-width:min(160px,42vw);object-fit:contain;display:block}
-.brand-mark{
-  font-size:10px;
-  font-weight:600;
-  letter-spacing:.04em;
-  color:var(--text-muted);
-  background:var(--surface-2);
-  padding:4px 10px;
-  border-radius:999px;
-  border:1px solid var(--border);
-}
-.intro{flex-shrink:0}
-.intro h1{
-  font-size:clamp(1rem,1.8vh,1.2rem);
-  font-weight:700;
-  line-height:1.25;
-  letter-spacing:-.025em;
-  color:var(--text);
-}
-.intro p{display:none}
-.blocks-grid{
-  flex:1;
-  min-height:0;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  align-content:stretch;
-}
-.block{
-  background:var(--surface-2);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  padding:10px 12px;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-.block-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.block-num{
-  font-size:10px;
-  font-weight:700;
-  color:var(--accent);
-  background:var(--accent-soft);
-  width:20px;height:20px;
-  border-radius:6px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.block-title{font-size:10px;font-weight:600;letter-spacing:.03em;color:var(--text-secondary)}
-.field{padding:7px 0;border-top:1px solid var(--border)}
-.field:first-of-type{border-top:none;padding-top:0}
-.field-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
-.field label{font-size:11px;font-weight:500;color:var(--text-secondary);line-height:1.3;flex:1}
-.field .val{
-  font-size:11px;
-  font-weight:700;
-  color:var(--accent);
-  background:var(--accent-soft);
-  padding:2px 8px;
-  border-radius:999px;
-  font-variant-numeric:tabular-nums;
-  white-space:nowrap;
-}
-.field small{display:none}
-input[type=range]{
-  width:100%;
-  height:4px;
-  border-radius:999px;
-  background:linear-gradient(90deg,var(--accent) var(--pct,0%),var(--border) var(--pct,0%));
-  -webkit-appearance:none;
-  appearance:none;
-  outline:none;
-  cursor:pointer;
-  touch-action:pan-y;
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:14px;height:14px;border-radius:50%;
-  background:#fff;
-  border:2px solid var(--accent);
-  box-shadow:0 1px 4px rgba(15,23,42,.15);
-}
-input[type=range]::-moz-range-thumb{
-  width:14px;height:14px;border-radius:50%;
-  background:#fff;border:2px solid var(--accent);
-  box-shadow:0 1px 4px rgba(15,23,42,.15);
-}
-.showcase{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:14px 16px 12px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-  position:relative;
-  box-shadow:var(--shadow);
-}
-.showcase-inner{
-  flex:1;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.dash-header{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:10px;
-  flex-shrink:0;
-  min-height:clamp(108px,17vh,148px);
-}
-.hero-chart{
-  background:linear-gradient(145deg,#0f766e,#0d9488);
-  border-radius:var(--radius-sm);
-  padding:16px 18px;
-  color:#fff;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:8px;
-  min-height:100%;
-}
-.payback-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-.payback-num{font-size:clamp(1.9rem,5.5vh,2.75rem);font-weight:700;line-height:1;letter-spacing:-.03em}
-.payback-num em{font-style:normal}
-.payback-num .be-unit{font-size:.3em;font-weight:500;opacity:.85}
-.be-track{height:7px;background:rgba(255,255,255,.28);border-radius:999px;overflow:hidden;margin-top:4px}
-.be-fill{height:100%;background:#fff;border-radius:999px;transition:width .4s cubic-bezier(.22,1,.36,1);width:0;box-shadow:0 0 8px rgba(255,255,255,.35)}
-.be-scale{display:flex;justify-content:space-between;font-size:9px;opacity:.75;margin-top:2px}
-.roi-chart{
-  background:var(--surface-2);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  display:flex;align-items:center;justify-content:center;
-  padding:12px;
-  min-height:100%;
-}
-.roi-ring{
-  --roi:0%;
-  width:clamp(88px,min(15vh,120px),124px);
-  height:clamp(88px,min(15vh,120px),124px);
-  border-radius:50%;
-  background:conic-gradient(var(--accent) 0 var(--roi),var(--border) var(--roi) 100%);
-  display:flex;align-items:center;justify-content:center;
-  transition:background .4s ease;
-  box-shadow:0 2px 12px rgba(15,118,110,.12);
-}
-.roi-ring-inner{
-  width:calc(100% - 16px);
-  height:calc(100% - 16px);
-  border-radius:50%;
-  background:var(--surface);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;
-}
-.roi-num{font-size:clamp(1.1rem,2.8vh,1.5rem);font-weight:700;color:var(--accent);line-height:1}
-.roi-lbl{font-size:9px;color:var(--text-muted);margin-top:3px;font-weight:600;line-height:1.2;padding:0 4px}
-.verdict{
-  font-size:11px;
-  line-height:1.45;
-  color:var(--text-secondary);
-  background:var(--highlight-soft);
-  border:1px solid #bae6fd;
-  border-radius:var(--radius-sm);
-  padding:9px 12px;
-  flex-shrink:0;
-}
-.verdict .hl{color:var(--highlight);font-weight:700}
-.chart-board{
-  flex:1;
-  min-height:0;
-  display:grid;
-  grid-template-columns:1fr 1.05fr .9fr;
-  gap:10px;
-}
-.chart-card{
-  background:var(--surface-2);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  padding:12px 14px;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-  overflow:hidden;
-}
-.chart-card-title{
-  font-size:10px;font-weight:700;color:var(--text-muted);
-  text-transform:uppercase;letter-spacing:.05em;
-  margin-bottom:10px;flex-shrink:0;
-}
-.donut-card{align-items:stretch}
-.donut-body{
-  flex:1;min-height:0;
-  display:flex;align-items:center;justify-content:center;
-  padding:4px 0;
-}
-.donut-wrap{
-  position:relative;
-  width:clamp(96px,min(22vh,28vw),156px);
-  height:clamp(96px,min(22vh,28vw),156px);
-  margin:0;
-  flex-shrink:0;
-}
-.donut{
-  width:100%;height:100%;
-  border-radius:50%;
-  transition:background .4s ease;
-  background:conic-gradient(from -90deg,var(--border) 0 100%);
-  box-shadow:inset 0 0 0 1px rgba(15,23,42,.04);
-}
-.donut-hole{
-  position:absolute;inset:17%;
-  border-radius:50%;
-  background:var(--surface-2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;
-  box-shadow:0 1px 4px rgba(15,23,42,.06);
-}
-.donut-main{font-size:clamp(12px,1.9vh,16px);font-weight:700;color:var(--accent);line-height:1.1}
-.donut-main.accent{color:var(--accent)}
-.donut-sub{font-size:8px;color:var(--text-muted);margin-top:2px;font-weight:500}
-.donut-legend{
-  display:flex;flex-direction:column;gap:7px;
-  font-size:10px;color:var(--text-secondary);
-  padding-top:10px;margin-top:auto;
-  border-top:1px solid var(--border);
-  flex-shrink:0;
-}
-.donut-legend span{display:flex;align-items:center;gap:6px}
-.donut-legend b{margin-left:auto;color:var(--text);font-weight:700;font-size:11px}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.dot.gain{background:#14b8a6}
-.dot.cost{background:#fbbf24}
-.bars-card{justify-content:stretch}
-.bars-card .stat-chart{
-  flex:1;min-height:0;
-  display:flex;flex-direction:column;justify-content:center;gap:7px;
-  padding:10px 0;margin-bottom:0;
-  border-bottom:1px solid var(--border);
-}
-.bars-card .stat-chart:last-child{border-bottom:none}
-.stat-row{display:flex;justify-content:space-between;align-items:baseline}
-.stat-lbl{font-size:10px;color:var(--text-muted);font-weight:500}
-.stat-num{font-size:clamp(14px,2.2vh,17px);font-weight:700;color:var(--text)}
-.stat-num.accent{color:var(--accent)}
-.bar-track{height:8px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:auto}
-.bar-fill{height:100%;border-radius:999px;transition:width .4s cubic-bezier(.22,1,.36,1);width:0}
-.bar-fill.teal{background:linear-gradient(90deg,#0f766e,#14b8a6)}
-.bar-fill.blue{background:linear-gradient(90deg,#0369a1,#38bdf8)}
-.bar-fill.gold{background:linear-gradient(90deg,#d97706,#fbbf24)}
-.fte-dots{display:flex;gap:4px;margin:2px 0}
-.fte-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:background .3s}
-.fte-dot.on{background:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
-.compare-card{justify-content:stretch}
-.v-bars{
-  display:flex;gap:14px;align-items:stretch;justify-content:center;
-  flex:1;min-height:0;padding:6px 8px 2px;
-}
-.v-bar-col{
-  display:flex;flex-direction:column;align-items:center;
-  gap:4px;flex:1;max-width:80px;height:100%;
-}
-.v-bar-stack{
-  flex:1;width:100%;min-height:72px;
-  background:var(--border);border-radius:8px 8px 5px 5px;
-  display:flex;align-items:flex-end;overflow:hidden;
-}
-.v-bar{width:100%;border-radius:5px 5px 3px 3px;transition:height .4s cubic-bezier(.22,1,.36,1);height:0}
-.v-bar.gain{background:linear-gradient(180deg,#14b8a6,#0f766e)}
-.v-bar.cost{background:linear-gradient(180deg,#fbbf24,#d97706)}
-.v-bar-val{font-size:11px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
-.v-bar-lbl{font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
-.compare-note{
-  display:block;
-  font-size:10px;color:var(--text-secondary);
-  text-align:center;padding-top:10px;margin-top:auto;
-  border-top:1px solid var(--border);
-  flex-shrink:0;line-height:1.35;
-}
-.compare-note b{color:var(--accent);font-weight:700}
-.dash-foot{
-  display:flex;
-  gap:8px;
-  align-items:flex-end;
-  flex-shrink:0;
-}
-.dash-foot .assum{flex:1;margin:0}
-.actions{display:flex;gap:6px;flex-shrink:0}
-.actions button{
-  font-family:inherit;font-size:10px;font-weight:600;
-  padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;
-  border:1px solid transparent;transition:all .15s ease;
-  white-space:nowrap;
-}
-.actions button:hover{transform:translateY(-1px)}
-.btn-solid{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(15,118,110,.25)}
-.btn-solid:hover{background:var(--accent-hover)}
-.btn-line{background:var(--surface);border-color:var(--border-strong);color:var(--text-secondary)}
-.btn-line:hover{background:var(--surface-2)}
-.assum{
-  background:var(--surface-2);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  padding:6px 10px;
-  color:var(--text-secondary);
-  font-size:10px;
-}
-.assum[open]{
-  position:absolute;bottom:12px;left:12px;right:12px;z-index:10;
-  max-height:40vh;overflow-y:auto;
-  background:var(--surface);
-  box-shadow:var(--shadow-lg);
-  border-color:var(--border-strong);
-}
-.assum summary{cursor:pointer;color:var(--text);font-weight:600;list-style:none;font-size:10px}
-.assum summary::-webkit-details-marker{display:none}
-.assum ul{margin:6px 0 0 14px;line-height:1.45;font-size:9px;color:var(--text-secondary)}
-.assum li{margin-bottom:3px}
-.assum b{color:var(--text);font-weight:600}
-.foot{display:none}
-.page-foot{
-  grid-column:1/-1;
-  text-align:center;
-  padding:8px 12px 10px;
-  font-size:10px;
-  color:var(--text-muted);
-}
-@media(max-width:900px){
-  html,body{overflow:auto;height:auto;min-height:100dvh;-webkit-overflow-scrolling:touch}
-  .shell{
-    height:auto;
-    min-height:100dvh;
-    grid-template-columns:1fr;
-    grid-template-rows:auto;
-    grid-auto-rows:auto;
-    overflow:visible;
-    padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left));
-    gap:10px;
-  }
-  .configure,.showcase{
-    overflow:visible;
-    min-height:auto;
-    padding:14px 14px 12px;
-  }
-  .brand{flex-wrap:wrap;gap:8px}
-  .intro h1{font-size:clamp(1.05rem,4.5vw,1.25rem)}
-  .blocks-grid{grid-template-columns:1fr 1fr;gap:8px}
-  .dash-header{
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    min-height:auto;
-  }
-  .hero-chart{padding:14px 16px}
-  .payback-num{font-size:clamp(1.45rem,6vw,2rem)}
-  .roi-ring{width:clamp(84px,22vw,110px);height:clamp(84px,22vw,110px)}
-  .chart-board{grid-template-columns:1fr 1fr;gap:8px}
-  .donut-wrap{width:clamp(96px,28vw,140px);height:clamp(96px,28vw,140px)}
-  .dash-foot{flex-direction:column;align-items:stretch;gap:10px}
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .actions button{width:100%;padding:11px 12px;font-size:11px}
-  .page-foot{padding:10px 12px max(12px,env(safe-area-inset-bottom))}
-  .assum[open]{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));max-height:min(50vh,420px)}
-}
-@media(max-width:640px){
-  .blocks-grid{grid-template-columns:1fr}
-  .block{padding:12px 14px}
-  .field{padding:10px 0}
-  .field-top{align-items:flex-start;flex-wrap:wrap;gap:6px}
-  .field label{font-size:12px;min-width:0}
-  .field .val{font-size:12px;padding:3px 10px}
-  .dash-header{grid-template-columns:1fr}
-  .roi-chart{min-height:140px;padding:16px}
-  .roi-ring{width:clamp(100px,34vw,132px);height:clamp(100px,34vw,132px)}
-  .chart-board{grid-template-columns:1fr}
-  .chart-card{min-height:auto}
-  .v-bars{gap:10px;padding:8px 4px 4px}
-  .v-bar-col{max-width:none}
-  .v-bar-stack{min-height:88px}
-  .verdict{font-size:12px;padding:10px 12px}
-  .compare-note{font-size:11px}
-  .actions{grid-template-columns:1fr}
-  input[type=range]{height:6px}
-  input[type=range]::-webkit-slider-thumb{width:22px;height:22px}
-  input[type=range]::-moz-range-thumb{width:22px;height:22px}
-}
-@media(max-width:400px){
-  .shell{padding:8px 8px 0}
-  .configure,.showcase{padding:12px}
-  .brand img{height:28px;max-width:min(140px,55vw)}
-  .brand-mark{font-size:9px;padding:3px 8px}
-  .block-title{font-size:11px}
-  .payback-num{font-size:1.55rem}
-  .stat-num{font-size:15px}
-}
-@media(max-height:620px) and (min-width:901px){
-  .shell{padding:6px 8px 0}
-  .configure,.showcase{padding:10px 12px}
-  .field{padding:4px 0}
-  .field-top{margin-bottom:5px}
-  .chart-card{padding:8px 10px}
-  .hero-chart{padding:12px 14px}
-  .donut-wrap{width:clamp(80px,18vh,120px);height:clamp(80px,18vh,120px)}
-  .dash-header{min-height:96px}
-}
-@media print{
-  html,body{overflow:visible;height:auto}
-  .shell{height:auto;grid-template-columns:1fr;padding:0}
-  .configure{display:none}
-  .showcase{box-shadow:none}
-  .actions{display:none}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>EzRecruit ROI Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            teal: { brand: "#0F9D8C", soft: "#E6F7F5", muted: "#CCFBF1", deep: "#0B7A6D" },
+            navy: { brand: "#0F172A" },
+            surface: { page: "#F4F6F9", card: "#FFFFFF", muted: "#F8FAFC" },
+          },
+          fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
+          boxShadow: {
+            card: "0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 16px rgba(15, 23, 42, 0.04)",
+            slider: "0 2px 8px rgba(15, 157, 140, 0.25), 0 0 0 1px rgba(15, 157, 140, 0.1)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html, body, #root { height: 100%; }
+    body {
+      background: #F4F6F9;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @media (min-width: 901px) {
+      html, body, #root { overflow: hidden; }
+      .inputs-panel { overflow: hidden; }
+    }
+    @media (max-width: 900px) {
+      html, body, #root {
+        height: auto;
+        min-height: 100dvh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .inputs-panel { overflow: visible; }
+      .r-slider { height: 8px; }
+      .r-slider::-webkit-slider-thumb { width: 24px; height: 24px; }
+      .r-slider::-moz-range-thumb { width: 24px; height: 24px; }
+    }
+    .r-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0F9D8C var(--pct, 0%), #E2E8F0 var(--pct, 0%));
+      outline: none;
+      cursor: pointer;
+    }
+    .r-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2px solid #0F9D8C;
+      box-shadow: 0 2px 8px rgba(15, 157, 140, 0.35);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .r-slider::-webkit-slider-thumb:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(15, 157, 140, 0.45); }
+    .r-slider::-webkit-slider-thumb:active { transform: scale(1.08); }
+    .r-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2px solid #0F9D8C;
+      box-shadow: 0 2px 8px rgba(15, 157, 140, 0.35);
+      cursor: pointer;
+    }
+    .r-slider:focus { outline: none; }
+    .r-slider:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(15, 157, 140, 0.15), 0 4px 12px rgba(15, 157, 140, 0.35); }
+    @keyframes pop {
+      0% { transform: scale(0.96); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pop { animation: pop 0.25s ease-out; }
+    .chart-bar-fill { transition: width 0.55s cubic-bezier(.22,1,.36,1); }
+    .results-green-card {
+      background: linear-gradient(165deg, #0F766E 0%, #0B5E54 45%, #094A44 100%);
+      box-shadow: 0 8px 32px rgba(11, 94, 84, 0.35);
+    }
+    .results-inner {
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
 </head>
+<body class="font-sans text-navy-brand antialiased">
+  <div id="root"></div>
 
-<body>
-<div class="shell">
-  <aside class="configure">
-    <div class="brand">
-      <img src="https://ezrecruit.in/assets/logo-C4ozb_iM.png" alt="EzRecruit">
-      <span class="brand-mark">ROI Calculator</span>
-    </div>
-    <div class="intro">
-      <h1>See your EzRecruit return</h1>
-    </div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <div class="blocks-grid">
-    <div class="block">
-      <div class="block-head"><span class="block-num">01</span><span class="block-title">Your team</span></div>
-      <div class="field">
-        <div class="field-top"><label>Recruiters on EzRecruit</label><span class="val" id="vRec">10</span></div>
-        <input type="range" id="rec" min="1" max="200" value="10">
-        <small>Full-time recruiters who would use the platform.</small>
-      </div>
-      <div class="field">
-        <div class="field-top"><label>Fully-loaded cost / recruiter / mo</label><span class="val" id="vSal">₹40,000</span></div>
-        <input type="range" id="sal" min="15000" max="200000" step="1000" value="40000">
-        <small>Salary plus overhead — set to your market.</small>
-      </div>
-      <div class="field">
-        <div class="field-top"><label>Working days per month</label><span class="val" id="vDays">22</span></div>
-        <input type="range" id="days" min="18" max="26" value="22">
-      </div>
-    </div>
+  <script type="text/babel">
+    const { useMemo, useState, useEffect, useRef } = React;
 
-    <div class="block">
-      <div class="block-head"><span class="block-num">02</span><span class="block-title">Time reclaimed</span></div>
-      <div class="field">
-        <div class="field-top"><label>Hours saved per recruiter / day</label><span class="val" id="vHrs">1.5</span></div>
-        <input type="range" id="hrs" min="0.25" max="3" step="0.25" value="1.5">
-        <small>Less rework, conversational search, trackers &amp; WhatsApp. Case study: ~1 hr/day.</small>
-      </div>
-      <div class="field">
-        <div class="field-top"><label>Productive hours in a day</label><span class="val" id="vWork">8</span></div>
-        <input type="range" id="work" min="6" max="10" value="8">
-      </div>
-    </div>
+    const WORKING_DAYS_DEFAULT = 22;
+    const HOURS_SAVED_PER_DAY = 1.5;
+    const EZRECRUIT_COST_PER_USER = 1200;
+    const PRODUCTIVE_HOURS_PER_DAY = 8;
 
-    <div class="block">
-      <div class="block-head"><span class="block-num">03</span><span class="block-title">Placement economics</span></div>
-      <div class="field">
-        <div class="field-top"><label>Average fee per placement</label><span class="val" id="vFee">₹1,50,000</span></div>
-        <input type="range" id="fee" min="20000" max="1000000" step="10000" value="150000">
-      </div>
-      <div class="field">
-        <div class="field-top"><label>Extra placements from freed time</label><span class="val" id="vExtra">30%</span></div>
-        <input type="range" id="extra" min="0" max="100" step="5" value="30">
-        <small>Share of reclaimed capacity that becomes placements. Default 30% is conservative.</small>
-      </div>
-    </div>
+    function formatIndianCurrency(value) {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency", currency: "INR", maximumFractionDigits: 0,
+      }).format(Math.round(value));
+    }
 
-    <div class="block">
-      <div class="block-head"><span class="block-num">04</span><span class="block-title">EzRecruit price</span></div>
-      <div class="field">
-        <div class="field-top"><label>Per seat / month</label><span class="val" id="vPrice">₹1,200</span></div>
-        <input type="range" id="price" min="0" max="6000" step="100" value="1200">
-        <small>Use your quote, or keep the default until sales confirms.</small>
-      </div>
-    </div>
-    </div>
-  </aside>
+    function formatIndianNumber(value) {
+      return new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(Math.round(value));
+    }
 
-  <main class="showcase">
-    <div class="showcase-inner">
-      <div class="dash-header">
-        <div class="hero-chart">
-          <div class="payback-label">Pays for itself after</div>
-          <div class="payback-num"><em id="beVal">—</em> <span class="be-unit" id="beUnit">extra placements / yr</span></div>
-          <div class="be-track"><div class="be-fill" id="beFill"></div></div>
-          <div class="be-scale"><span>0</span><span id="beScaleMax">5</span> placements</div>
+    function SectionBadge({ num, label, color = "teal" }) {
+      const colors = {
+        teal: "bg-teal-soft text-teal-brand",
+        blue: "bg-blue-50 text-blue-600",
+        slate: "bg-slate-100 text-slate-600",
+      };
+      return (
+        <div className="mb-2 flex items-center gap-2">
+          <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${colors[color]}`}>
+            {num}
+          </span>
+          <span className="text-[11px] font-semibold text-slate-700">{label}</span>
         </div>
-        <div class="roi-chart">
-          <div class="roi-ring" id="roiRing">
-            <div class="roi-ring-inner">
-              <span class="roi-num" id="kROI">—</span>
-              <span class="roi-lbl">Return on cost</span>
-            </div>
+      );
+    }
+
+    function EzRecruitFixedField({ label, value, note }) {
+      return (
+        <div className="rounded-lg border border-teal-brand/20 bg-teal-soft/50 px-3 py-2.5 sm:px-3.5">
+          <div className="mb-1.5 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+            <label className="text-[11px] font-medium leading-snug text-slate-600 sm:text-[10px]">{label}</label>
+            <span className="w-fit shrink-0 rounded-md bg-white px-2 py-0.5 text-[10px] font-bold tabular-nums text-teal-brand shadow-sm sm:max-w-[55%] sm:text-right">
+              {value}
+            </span>
+          </div>
+          <p className="text-[10px] leading-relaxed text-teal-brand/80 sm:text-[9px]">{note}</p>
+        </div>
+      );
+    }
+
+    function SliderField({ label, value, onChange, min, max, step = 1, unit, formatDisplay }) {
+      const pct = ((value - min) / (max - min)) * 100;
+      const display = formatDisplay ? formatDisplay(value) : `${value}${unit ? ` ${unit}` : ""}`;
+      return (
+        <div>
+          <div className="mb-2 flex flex-col gap-1 sm:mb-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+            <label className="text-[11px] font-medium text-slate-500 sm:text-[10px]">{label}</label>
+            <span className="w-fit rounded-md bg-teal-soft px-2 py-0.5 text-[11px] font-bold tabular-nums text-teal-brand sm:px-1.5 sm:text-[10px]">
+              {display}
+            </span>
+          </div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={value}
+            onChange={(e) => onChange(Number(e.target.value))}
+            className="r-slider"
+            style={{ "--pct": `${pct}%` }}
+          />
+          <div className="mt-0.5 flex justify-between text-[8px] font-medium text-slate-300">
+            <span>{formatDisplay ? formatDisplay(min) : min}</span>
+            <span>{formatDisplay ? formatDisplay(max) : max}</span>
           </div>
         </div>
-      </div>
+      );
+    }
 
-      <div class="verdict" id="verdict">—</div>
+    function ResultsGreenCard({ r, popKey, workingDays }) {
+      const fte = (r.timeSavedPerYear / (PRODUCTIVE_HOURS_PER_DAY * workingDays * 12)).toFixed(1).replace(/\.0$/, "");
+      const total = Math.max(r.annualRecruitmentCostSaved, 1);
+      const netPct = (r.netSavings / total) * 100;
+      const costPct = (r.annualEzRecruitCost / total) * 100;
 
-      <div class="chart-board">
-        <div class="chart-card donut-card">
-          <div class="chart-card-title">Savings split</div>
-          <div class="donut-body">
-            <div class="donut-wrap">
-              <div class="donut" id="valueDonut"></div>
-              <div class="donut-hole">
-                <span class="donut-main accent" id="kTimeVal">—</span>
-                <span class="donut-sub">saved / yr</span>
+      return (
+        <div className="results-green-card flex min-h-0 flex-col rounded-2xl p-4 text-white sm:rounded-3xl sm:p-5 md:h-full md:p-6">
+          {/* Hours hero */}
+          <div className="mb-4 shrink-0 sm:mb-5">
+            <div className="mb-1 flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-xs font-medium text-white/90 sm:text-sm">With EzRecruit you are saving</span>
+              <span className="text-[10px] font-medium text-white/50">hrs/yr</span>
+            </div>
+            <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
+              <p className="text-[clamp(2.25rem,6vw,3rem)] font-extrabold leading-none tracking-tight">
+                {formatIndianNumber(r.timeSavedPerYear)}
+              </p>
+              <p className="pb-1 text-sm text-white/60">total working hours</p>
+            </div>
+            <p className="mt-2.5 flex items-start gap-1.5 text-[11px] leading-relaxed text-white/55">
+              <svg className="mt-0.5 shrink-0 opacity-70" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+              </svg>
+              Equivalent to saving <strong className="font-semibold text-white">{fte} full-time employees</strong>&apos; yearly bandwidth.
+            </p>
+          </div>
+
+          {/* Breakdown + chart */}
+          <div className="results-inner mb-4 shrink-0 rounded-2xl p-4">
+            {/* Stacked savings chart */}
+            <div className="mb-4">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-white/50">Savings split</p>
+              <div className="flex h-2.5 overflow-hidden rounded-full bg-white/10">
+                <div className="chart-bar-fill bg-[#5EEAD4]" style={{ width: `${netPct}%` }} title="Net savings" />
+                <div className="chart-bar-fill bg-[#FB923C]" style={{ width: `${costPct}%` }} title="EzRecruit cost" />
+              </div>
+              <div className="mt-2 flex gap-4 text-[9px] text-white/50">
+                <span className="flex items-center gap-1"><i className="inline-block h-1.5 w-1.5 rounded-full bg-[#5EEAD4]" /> Net</span>
+                <span className="flex items-center gap-1"><i className="inline-block h-1.5 w-1.5 rounded-full bg-[#FB923C]" /> Cost</span>
+              </div>
+            </div>
+
+            <div className="space-y-2.5 text-sm">
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <span className="text-white/70">Total Saved</span>
+                <span className="font-bold tabular-nums text-white">{formatIndianCurrency(r.annualRecruitmentCostSaved)}</span>
+              </div>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <span className="text-white/70">Cost of EzRecruit</span>
+                <span className="font-bold tabular-nums text-[#FDBA74]">{formatIndianCurrency(r.annualEzRecruitCost)}</span>
+              </div>
+            </div>
+
+            <div key={popKey} className="pop mt-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+              <span className="font-semibold text-white">Net You Saved</span>
+              <span className="text-lg font-extrabold tabular-nums text-[#5EEAD4] sm:text-xl md:text-2xl">
+                {formatIndianCurrency(r.netSavings)}
+              </span>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-auto shrink-0">
+            <a
+              href="https://ezrecruit.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-bold text-[#0B5E54] shadow-sm transition active:scale-[0.98] hover:bg-white/95 hover:shadow-md sm:py-3"
+            >
+              Get Started with EzRecruit
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    function EzRecruitROICalculator() {
+      const [recruiters, setRecruiters] = useState(10);
+      const [avgCost, setAvgCost] = useState(40000);
+      const [workingDays, setWorkingDays] = useState(WORKING_DAYS_DEFAULT);
+
+      const r = useMemo(() => {
+        const n = Math.max(0, recruiters);
+        const cost = Math.max(0, avgCost);
+        const days = Math.max(1, workingDays);
+        const timeSavedPerYear = n * HOURS_SAVED_PER_DAY * days * 12;
+        const annualRecruitmentCostSaved = n * cost * 12 * (HOURS_SAVED_PER_DAY / PRODUCTIVE_HOURS_PER_DAY);
+        const annualEzRecruitCost = n * EZRECRUIT_COST_PER_USER * 12;
+        const netSavings = annualRecruitmentCostSaved - annualEzRecruitCost;
+        return { timeSavedPerYear, annualRecruitmentCostSaved, annualEzRecruitCost, netSavings, workingDaysPerMonth: days };
+      }, [recruiters, avgCost, workingDays]);
+
+      const [popKey, setPopKey] = useState(0);
+      const firstRender = useRef(true);
+      useEffect(() => {
+        if (firstRender.current) { firstRender.current = false; return; }
+        setPopKey((k) => k + 1);
+      }, [r.netSavings]);
+
+      return (
+        <div className="flex min-h-[100dvh] items-stretch justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-4 md:h-full md:min-h-0 md:items-center md:p-5">
+          <div className="flex w-full max-w-5xl flex-col overflow-visible rounded-2xl border border-slate-200/80 bg-surface-card shadow-card md:h-full md:max-h-[min(100dvh,780px)] md:overflow-hidden">
+
+            {/* Top bar */}
+            <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-3 py-3 sm:px-4 sm:py-2.5 md:px-5">
+              <img
+                src="https://ezrecruit.in/assets/logo-C4ozb_iM.png"
+                alt="EzRecruit"
+                className="h-8 object-contain sm:h-7"
+              />
+              <div className="min-w-0 text-right">
+                <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400 sm:text-[10px]">ROI Calculator</p>
+                <h1 className="text-sm font-bold text-navy-brand sm:text-base md:text-sm">See Your Savings</h1>
+              </div>
+            </header>
+
+            {/* Body */}
+            <div className="grid flex-1 md:min-h-0 md:grid-cols-[1fr_1.1fr]">
+
+              {/* LEFT — sliders */}
+              <div className="inputs-panel flex flex-col justify-center border-b border-slate-100 p-3 sm:p-4 md:min-h-0 md:border-b-0 md:border-r">
+                <div className="space-y-3 sm:space-y-2">
+                  <div className="rounded-xl border border-slate-100 bg-surface-muted p-3.5 sm:p-3">
+                    <SectionBadge num="01" label="Team Details" />
+                    <div className="space-y-2.5">
+                      <SliderField
+                        label="Number of Recruiters"
+                        value={recruiters}
+                        onChange={setRecruiters}
+                        min={1}
+                        max={200}
+                        step={1}
+                      />
+                      <SliderField
+                        label="Avg Recruiter Cost / Month"
+                        value={avgCost}
+                        onChange={setAvgCost}
+                        min={15000}
+                        max={200000}
+                        step={1000}
+                        formatDisplay={(v) => formatIndianCurrency(v)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-100 bg-surface-muted p-3.5 sm:p-3">
+                    <SectionBadge num="02" label="Time Saved with EzRecruit" color="blue" />
+                    <div className="space-y-2.5">
+                      <EzRecruitFixedField
+                        label="Hours Saved / Recruiter / Day"
+                        value="1 hr 30 min or more"
+                        note="With EzRecruit, each recruiter saves 1 hour 30 minutes or more every day through streamlined workflow, WhatsApp scheduling, auto candidate tracker, and many more features."
+                      />
+                      <SliderField
+                        label="Working Days / Month"
+                        value={workingDays}
+                        onChange={setWorkingDays}
+                        min={18}
+                        max={26}
+                        step={1}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-teal-brand/15 bg-teal-soft/30 p-3.5 sm:p-3">
+                    <SectionBadge num="03" label="EzRecruit Cost" color="teal" />
+                    <EzRecruitFixedField
+                      label="Cost per User / Month"
+                      value="₹1,200"
+                      note="Standard EzRecruit pricing: ₹1,200 per recruiter per month."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT — results */}
+              <div className="bg-surface-muted/50 p-3 sm:p-4 md:min-h-0">
+                <ResultsGreenCard r={r} popKey={popKey} workingDays={workingDays} />
               </div>
             </div>
           </div>
-          <div class="donut-legend">
-            <span><i class="dot gain"></i> Time value <b id="barGainLbl">—</b></span>
-            <span><i class="dot cost"></i> Platform cost <b id="kCost">—</b></span>
-          </div>
         </div>
-
-        <div class="chart-card bars-card">
-          <div class="chart-card-title">Capacity unlocked</div>
-          <div class="stat-chart">
-            <div class="stat-row"><span class="stat-lbl">Hours reclaimed</span><span class="stat-num" id="kHours">—</span></div>
-            <div class="bar-track"><div class="bar-fill teal" id="hoursBar"></div></div>
-          </div>
-          <div class="stat-chart">
-            <div class="stat-row"><span class="stat-lbl">FTE freed</span><span class="stat-num" id="kFTE">—</span></div>
-            <div class="fte-dots" id="fteViz"></div>
-            <div class="bar-track"><div class="bar-fill blue" id="fteBar"></div></div>
-          </div>
-          <div class="stat-chart">
-            <div class="stat-row"><span class="stat-lbl">Extra revenue</span><span class="stat-num accent" id="kUpside">—</span></div>
-            <div class="bar-track"><div class="bar-fill gold" id="upsideBar"></div></div>
-          </div>
-        </div>
-
-        <div class="chart-card compare-card">
-          <div class="chart-card-title">Annual value</div>
-          <div class="v-bars">
-            <div class="v-bar-col">
-              <div class="v-bar-stack"><div class="v-bar gain" id="barGain"></div></div>
-              <span class="v-bar-val" id="barGainVal">—</span>
-              <span class="v-bar-lbl">Saved</span>
-            </div>
-            <div class="v-bar-col">
-              <div class="v-bar-stack"><div class="v-bar cost" id="barCost"></div></div>
-              <span class="v-bar-val" id="barCostVal">—</span>
-              <span class="v-bar-lbl">Cost</span>
-            </div>
-          </div>
-          <p class="compare-note" id="barNote"></p>
-        </div>
-      </div>
-    </div>
-  </main>
-  <p class="page-foot">EzRecruit ROI Calculator · Figures in ₹ (INR) · Not financial advice</p>
-</div>
-
-<script>
-  const $=id=>document.getElementById(id);
-  const fmtN=n=>n.toLocaleString('en-IN');
-  function fmtCur(n){
-    n=Math.round(n);
-    if(n>=10000000) return '₹'+(n/10000000).toFixed(n%10000000?2:0)+' Cr';
-    if(n>=100000)   return '₹'+(n/100000).toFixed(n%100000?2:0)+' L';
-    return '₹'+fmtN(n);
-  }
-  const ids=['rec','sal','days','hrs','work','fee','extra','price'];
-  ids.forEach(i=>{
-    $(i).addEventListener('input',()=>{updateSliders();calc();});
-  });
-
-  function updateSliders(){
-    ids.forEach(id=>{
-      const el=$(id);
-      const min=+el.min||0, max=+el.max||100, val=+el.value;
-      const pct=((val-min)/(max-min))*100;
-      el.style.setProperty('--pct',pct+'%');
-    });
-  }
-
-  function calc(){
-    const rec=+$('rec').value, sal=+$('sal').value, days=+$('days').value,
-          hrs=+$('hrs').value, work=+$('work').value, fee=+$('fee').value,
-          extra=+$('extra').value/100, price=+$('price').value;
-
-    // labels
-    $('vRec').textContent=rec;
-    $('vSal').textContent=fmtCur(sal);
-    $('vDays').textContent=days;
-    $('vHrs').textContent=hrs.toFixed(2).replace(/\.00$/,'');
-    $('vWork').textContent=work;
-    $('vFee').textContent=fmtCur(fee);
-    $('vExtra').textContent=(extra*100)+'%';
-    $('vPrice').textContent=fmtCur(price);
-
-    // core math
-    const hoursYr = rec*hrs*days*12;                 // total recruiter hours saved/year
-    const hourlyCost = sal/(days*work);              // cost of one recruiter hour
-    const timeValueYr = hoursYr*hourlyCost;          // value of that time
-    const fteFreed = (hrs/work)*rec;                 // FTE-equivalent capacity freed
-    const costYr = price*rec*12;                     // platform cost/year
-
-    // Extra placements from freed capacity, using a transparent, conservative proxy:
-    // each freed FTE can add `extra` share of a baseline placements-per-FTE-year.
-    const PLACEMENTS_PER_FTE_YR = 12;
-    const extraPlac = fteFreed*extra*PLACEMENTS_PER_FTE_YR;
-    const upsideYr = extraPlac*fee;
-
-    // break-even in placements (how many extra placements cover the annual platform cost)
-    const bePlac = fee>0 ? costYr/fee : 0;
-
-    // ROI on time savings alone
-    const roi = costYr>0 ? timeValueYr/costYr : 0;
-
-    // ---- render ----
-    $('kHours').textContent=fmtN(Math.round(hoursYr));
-    $('kFTE').textContent=fteFreed.toFixed(1);
-    $('kTimeVal').textContent=fmtCur(timeValueYr);
-    $('kCost').textContent=fmtCur(costYr);
-    $('kROI').textContent=(roi>=1?roi.toFixed(1):roi.toFixed(2))+'×';
-    $('kUpside').textContent=fmtCur(upsideYr);
-
-    // break-even
-    let beText, beUnit;
-    if(fee<=0){beText='—';beUnit='set a placement fee';}
-    else if(bePlac<1){beText='<1';beUnit='extra placement a year';}
-    else {beText=bePlac.toFixed(1);beUnit='extra placements a year';}
-    $('beVal').textContent=beText;
-    $('beUnit').textContent=beUnit;
-
-    // verdict line
-    let v;
-    if(costYr===0){v='Enter a per-seat price to see your payback.';}
-    else if(roi>=1){
-      v='On time savings alone, EzRecruit returns <span class="hl">'+ (roi>=1?roi.toFixed(1):roi.toFixed(2)) +'×</span> what it costs and one extra placement covers roughly <span class="hl">'+ (fee>=costYr?'the entire year':'a big share of the year') +'</span>.';
-    } else {
-      v='Even before extra placements, EzRecruit recovers <span class="hl">'+Math.round(roi*100)+'%</span> of its cost in reclaimed time — and just <span class="hl">'+beText+'</span> extra placements a year makes it fully profitable.';
+      );
     }
-    $('verdict').innerHTML=v;
 
-    // chart visuals
-    const beMax=Math.max(5,Math.ceil((bePlac||0)*1.25)||5);
-    $('beScaleMax').textContent=beMax;
-    $('beFill').style.width=(fee>0?Math.min(bePlac/beMax,1)*100:0)+'%';
-
-    const roiRingPct=Math.min(roi/6,1)*100;
-    $('roiRing').style.setProperty('--roi',roiRingPct+'%');
-
-    const donutTotal=Math.max(timeValueYr+costYr,1);
-    const saveShare=(timeValueYr/donutTotal)*100;
-    $('valueDonut').style.background='conic-gradient(from -90deg,#14b8a6 0 '+saveShare+'%,#fbbf24 '+saveShare+'% 100%)';
-
-    const hoursMax=Math.max(5000,hoursYr*1.15);
-    $('hoursBar').style.width=Math.min(hoursYr/hoursMax,1)*100+'%';
-
-    const fteMax=Math.max(3,fteFreed*1.25);
-    $('fteBar').style.width=Math.min(fteFreed/fteMax,1)*100+'%';
-    const dots=10;
-    let fteHtml='';
-    for(let i=0;i<dots;i++){
-      const on=fteFreed>=((i+1)/dots)*fteMax;
-      fteHtml+='<span class="fte-dot'+(on?' on':'')+'"></span>';
-    }
-    $('fteViz').innerHTML=fteHtml;
-
-    const upsideMax=Math.max(timeValueYr,upsideYr,1);
-    $('upsideBar').style.width=Math.min(upsideYr/upsideMax,1)*100+'%';
-
-    const total=Math.max(timeValueYr,costYr,1);
-    const costPct=Math.max(8,Math.min(100,costYr/total*100));
-    const gainPct=Math.max(8,Math.min(100,timeValueYr/total*100));
-    $('barCost').style.height=costPct+'%';
-    $('barGain').style.height=gainPct+'%';
-    $('barGainLbl').textContent=fmtCur(timeValueYr);
-    $('barGainVal').textContent=fmtCur(timeValueYr);
-    $('barCostVal').textContent=fmtCur(costYr);
-    $('barNote').innerHTML=costYr>0
-      ? '<b>'+(timeValueYr/costYr).toFixed(1)+'×</b> more in time value than annual cost'
-      : '';
-  }
-  updateSliders();
-  calc();
-</script>
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<EzRecruitROICalculator />);
+  </script>
 </body>
 </html>
